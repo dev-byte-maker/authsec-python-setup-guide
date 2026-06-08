@@ -1,0 +1,5 @@
+fastapi>=0.111.0
+mcp==1.27.1
+authsec-sdk==4.4.0
+python-dotenv==1.2.2
+uvicorn[standard]>=0.30.0
