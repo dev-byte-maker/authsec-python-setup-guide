@@ -99,5 +99,10 @@ async def mcp_handler(request: Request) -> StreamingResponse:
 
 # ── 5. Mount ─────────────────────────────────────────────────────────
 app = FastAPI()
-mount_mcp(app, "/mcp", mcp_handler, cfg)   # handler = adapter, NOT asgi_app directly
+# Patch: mount_mcp uses add_api_route whose DI breaks SDK closure handlers
+# under Python 3.14 (get_type_hints can't resolve types in local scopes).
+# Using Starlette's add_route avoids the DI layer entirely.
+app.add_api_route = lambda path, endpoint, methods=None, **kw: app.add_route(path, endpoint, methods=methods)
+mount_mcp(app, "/mcp", mcp_handler, cfg)
+del app.add_api_route  # restore FastAPI's normal add_api_route
 
